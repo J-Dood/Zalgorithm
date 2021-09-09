@@ -11,19 +11,18 @@ def z_algorithm(sequence, query):
     :rtype: list
     :returns a list of the start indexes of full matches of query in sequence
     """
-    # TODO fix the return list
     # Construct the single string
     combined_string = query + "$" + sequence
     # Create empty list for matches
     match_list = []
     # Create empty list for all Z values
-    z_list = []
+    z_list = [-1]
     # Initiate the variables for the z-algorithm
     right_edge = 0
     left_edge = 0
     k_prime = 0
     beta = 0
-    for k in range(len(combined_string)):
+    for k in range(1, len(combined_string)+1):
         temp_z = 0
         increment = 0
         if k > right_edge:
@@ -43,12 +42,13 @@ def z_algorithm(sequence, query):
                 while combined_string[beta + 1 + increment] == combined_string[right_edge + 1 + increment]:
                     temp_z += 1
                     increment += 1
-                z_list[k] = increment
+                temp_z = beta + increment - 1
                 right_edge = increment - 1
                 left_edge = k
+            z_list.append(temp_z)
     for x in z_list:
         if x == len(query):
-            match_list.append(x+1)
+            match_list.append(x)
     return match_list
 
 
