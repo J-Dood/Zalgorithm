@@ -46,7 +46,10 @@ def z_algorithm(sequence, query):
                 z_list[k] = increment
                 right_edge = increment - 1
                 left_edge = k
-    return z_list
+    for x in z_list:
+        if x == len(query):
+            match_list.append(x+1)
+    return match_list
 
 
 def main():
