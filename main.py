@@ -22,41 +22,53 @@ def z_algorithm(sequence, query):
     left_edge = 0
     k_prime = 0
     beta = 0
+
+    # Loop over each letter in the combined string
     for k in range(1, len(combined_string)+1):
         temp_z = 0
         increment = 0
+        # Case 1: Not in Z-box
         if k > right_edge:
-            while combined_string[increment] == combined_string[k + increment]:
+            # Match letters until mismatch found
+            while ((len(combined_string) - 1 >= k + increment)
+                    and (combined_string[increment] == combined_string[k + increment])):
                 temp_z += 1
                 increment += 1
             if temp_z > 0:
                 right_edge = k + temp_z - 1
                 left_edge = k
             z_list.append(temp_z)
+        # Case 2: In Z-box
         else:
             k_prime = k - left_edge + 1
             beta = right_edge - k + 1
+            # Case 2: Sub-case 1: Matching does not extend past Z-box end
             if z_list[k_prime] < beta:
                 temp_z = z_list[k_prime]
+            # Case 2: Sub-case 2: Matching extends past Z-box end
             else:
-                while combined_string[beta + 1 + increment] == combined_string[right_edge + 1 + increment]:
+                # Match letters past Z-box end until mismatch found
+                while ((len(combined_string) - 1 >= right_edge + 1 + increment)
+                       and (combined_string[beta + 1 + increment] == combined_string[right_edge + 1 + increment])):
                     temp_z += 1
                     increment += 1
                 temp_z = beta + increment - 1
+                # Update Z-box edges
                 right_edge = increment - 1
                 left_edge = k
             z_list.append(temp_z)
-    for x in z_list:
-        if x == len(query):
-            match_list.append(x)
+
+    # Use Z scores to compose list of indexes where perfect matches were found
+    for x in range(len(z_list) -1):
+        if z_list[x] == len(query):
+            match_list.append(x - len(query))
     return match_list
 
 
 def main():
     """handels the input, calls the z-algorithm, and prints the output"""
-    # Handel the file opening and prompt the user for query
+    # Handel the file opening of the FASTA file to be searched
     file = open(r"C:\Users\doodw\PycharmProjects\Zalgorithm\venv\input\testfasta.fasta", 'r')
-    query = input("Please enter a DNA sequence to search for").strip().lower()
     # Create an empty string to hold text sequence
     sequence = ""
     # Flag to ensure only one sequence is read from the Fasta
@@ -71,8 +83,13 @@ def main():
         else:
             line = line.strip().lower()
             sequence += line
+
+    # Prompt the user for query
+    query = input("Please enter a DNA sequence to search for: ").strip().lower()
+
     # Call the z-algorithm
     output = z_algorithm(sequence, query)
+
     # Print the output form the z-algorithm
     for index in output:
         print("A perfect match found at: " + str(index))
